@@ -1,6 +1,8 @@
 from getpass import getpass
 import requests as rq
 import pandas as pd
+from datetime import datetime
+from math import isnan
 
 BASE_URL = 'https://api.avg300.com/api/v1'
 
@@ -62,8 +64,7 @@ teams_path = '/teams?league='+tournament['id']
 teams_res = get(teams_path, headers=token_map).json()
 print("Equipos\n")
 for idx, team in enumerate(teams_res):
-    print(idx, ')', team['name'], '\nManager:',
-          team['manager'], '\nGrupo:', team['group_name'])
+    print(idx, ')', team['name'], "\nNombre corto:", team['shortName'])
 team_idx = int(input('Ingrese el numero de equipo:'))
 team = teams_res[team_idx]
 print("Equipo:", team['name'])
@@ -139,4 +140,21 @@ except FileNotFoundError as err:
     print("Archivo inexistente. Verifique el nombre y/o ubicacion")
     exit(1)
 
-print(df)
+add_player_path = '/playerteamcumulativestatistics'
+for idx in df.index:
+    casaca = ''
+    if isnan(df['CASACA'][idx]):
+        casaca = ''
+    else:
+        casaca = int(df['CASACA'][idx])
+    playerData['player_jersey'] = casaca
+    playerData['player_last_name'] = df['APELLIDO'][idx]
+    playerData['player_first_name'] = df['NOMBRE'][idx]
+    playerData['player_birthday'] = datetime.strftime(
+        df['FECHA. NAC.'][idx], '%Y-%m-%d')
+
+    add_player_res = post('/playerteamcumulativestatistics',
+                          data=playerData, headers={
+                              'authorization': token}).json()
+    print("Jugadora:", playerData['player_last_name'],
+          playerData['player_first_name'], "\nID:", add_player_res['id'])
