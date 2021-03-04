@@ -35,11 +35,22 @@ print("Bienvenido al cargador de Roster de Softbol\n")
 # League selection
 
 LEAGUES_PATH = '/leagues'
-leagues_res = rq.get(BASE_URL + LEAGUES_PATH, headers=token_map).json()
+leagues_res = get(BASE_URL + LEAGUES_PATH, headers=token_map).json()
 print('Ligas dispoinbles\n')
 for idx, league in enumerate(leagues_res):
     print(idx, ')', league['name'], '\n')
 league_idx = int(
-    input('Ingrese el numero de liga correspondiente:'))
+    input('Ingrese el numero de liga correspondiente: '))
 league = leagues_res[league_idx]
 print('Liga:', league['name'])
+
+# Tournament selection
+league_path = '/league/'+league['id']
+league_res = get(BASE_URL + league_path, headers=token_map).json()
+tournaments = league_res['tournaments']
+print('Torneos disponibles\n')
+for idx, tournament in enumerate(tournaments):
+    print(idx, ')', tournament['name'], '\n')
+tournament_idx = int(input('Ingrese el numero de torneo correspondiente: '))
+tournament = tournaments[tournament_idx]
+print('Torneo:', tournament['name'])
