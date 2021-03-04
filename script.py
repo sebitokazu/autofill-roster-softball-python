@@ -29,4 +29,17 @@ if 'token' not in login_res:
     exit(1)
 
 token = 'Token ' + login_res['token']
+token_map = {'authorization': token}
 print("Bienvenido al cargador de Roster de Softbol\n")
+
+# League selection
+
+LEAGUES_PATH = '/leagues'
+leagues_res = rq.get(BASE_URL + LEAGUES_PATH, headers=token_map).json()
+print('Ligas dispoinbles\n')
+for idx, league in enumerate(leagues_res):
+    print(idx, ')', league['name'], '\n')
+league_idx = int(
+    input('Ingrese el numero de liga correspondiente:'))
+league = leagues_res[league_idx]
+print('Liga:', league['name'])
